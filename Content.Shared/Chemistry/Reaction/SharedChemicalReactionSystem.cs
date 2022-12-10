@@ -102,7 +102,7 @@ namespace Content.Shared.Chemistry.Reaction
         /// <param name="reaction">The reaction to check.</param>
         /// <param name="lowestUnitReactions">How many times this reaction can occur.</param>
         /// <returns></returns>
-        private bool CanReact(Solution solution, ReactionPrototype reaction, EntityUid owner, out FixedPoint2 lowestUnitReactions)
+        private bool CanReact(Solution solution, ReactionPrototype reaction, EntityUid owner, out FixedPoint2 lowestUnitReactions, ReactionMixerComponent? mixerComponent = null)
         {
             lowestUnitReactions = FixedPoint2.MaxValue;
             if (solution.Temperature < reaction.MinimumTemperature)
@@ -111,6 +111,11 @@ namespace Content.Shared.Chemistry.Reaction
                 return false;
             } else if(solution.Temperature > reaction.MaximumTemperature)
             {
+                lowestUnitReactions = FixedPoint2.Zero;
+                return false;
+            }
+
+            if(reaction.RequiredMixerIDs != null && mixerComponent != null && reaction.RequiredMixerIDs.Except(mixerComponent.MixingGroups).Any()) {
                 lowestUnitReactions = FixedPoint2.Zero;
                 return false;
             }
@@ -215,7 +220,7 @@ namespace Content.Shared.Chemistry.Reaction
         ///     Removes the reactants from the solution, then returns a solution with all products.
         ///     WARNING: Does not trigger reactions between solution and new products.
         /// </summary>
-        private bool ProcessReactions(Solution solution, EntityUid owner, FixedPoint2 maxVolume, SortedSet<ReactionPrototype> reactions)
+        private bool ProcessReactions(Solution solution, EntityUid owner, FixedPoint2 maxVolume, SortedSet<ReactionPrototype> reactions, ReactionMixerComponent? mixerComponent = null)
         {
             HashSet<ReactionPrototype> toRemove = new();
             Solution? products = null;
@@ -223,7 +228,7 @@ namespace Content.Shared.Chemistry.Reaction
             // attempt to perform any applicable reaction
             foreach (var reaction in reactions)
             {
-                if (!CanReact(solution, reaction, owner, out var unitReactions))
+                if (!CanReact(solution, reaction, owner, out var unitReactions, mixerComponent))
                 {
                     toRemove.Add(reaction);
                     continue;
@@ -270,7 +275,7 @@ namespace Content.Shared.Chemistry.Reaction
         ///     Continually react a solution until no more reactions occur, with a volume constraint.
         ///     If a reaction's products would exceed the max volume, some product is deleted.
         /// </summary>
-        public void FullyReactSolution(Solution solution, EntityUid owner, FixedPoint2 maxVolume)
+        public void FullyReactSolution(Solution solution, EntityUid owner, FixedPoint2 maxVolume, ReactionMixerComponent? mixerComponent = null)
         {
             // construct the initial set of reactions to check.
             SortedSet<ReactionPrototype> reactions = new();
@@ -284,7 +289,7 @@ namespace Content.Shared.Chemistry.Reaction
             // exceed the iteration limit.
             for (var i = 0; i < MaxReactionIterations; i++)
             {
-                if (!ProcessReactions(solution, owner, maxVolume, reactions))
+                if (!ProcessReactions(solution, owner, maxVolume, reactions, mixerComponent))
                     return;
             }
 

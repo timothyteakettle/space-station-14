@@ -15,6 +15,13 @@ namespace Content.Shared.Chemistry.Components
         public bool CanReact { get; set; } = true;
 
         /// <summary>
+        ///     If reagents can be mixed within this container for reactions requiring mixing.
+        /// </summary>
+        [ViewVariables(VVAccess.ReadWrite)]
+        [DataField("canMix")]
+        public bool CanMix { get; set; } = true;
+
+        /// <summary>
         ///     Volume needed to fill this container.
         /// </summary>
         [ViewVariables]
