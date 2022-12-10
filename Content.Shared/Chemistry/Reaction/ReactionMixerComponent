@@ -1,0 +1,13 @@
+using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.Set;
+
+namespace Content.Shared.Chemistry.Reaction;
+
+[RegisterComponent]
+public sealed class ReactionMixerComponent
+{
+    /// <summary>
+    ///     List of IDs for the types of recipes it can mix, i.e. DRINKS, HOLY, etc
+    /// </summary>
+    [DataField("mixGroups")]
+    public List<string>? MixingGroups;
+}

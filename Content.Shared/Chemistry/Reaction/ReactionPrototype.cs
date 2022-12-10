@@ -39,6 +39,12 @@ namespace Content.Shared.Chemistry.Reaction
         public float MaximumTemperature = float.PositiveInfinity;
 
         /// <summary>
+        ///     The required mixer ID(s) to activate the reaction.
+        /// </summary>
+        [DataField("requiredMixerIDs")]
+        public List<string>? RequiredMixerIDs;
+
+        /// <summary>
         /// Reagents created when the reaction occurs.
         /// </summary>
         [DataField("products", customTypeSerializer:typeof(PrototypeIdDictionarySerializer<FixedPoint2, ReagentPrototype>))]
