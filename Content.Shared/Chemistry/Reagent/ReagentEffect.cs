@@ -73,6 +73,7 @@ namespace Content.Shared.Chemistry.Reagent
         Touch,
         Injection,
         Ingestion,
+        Mix,
     }
 
     public readonly record struct ReagentEffectArgs(
